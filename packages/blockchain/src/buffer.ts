@@ -118,8 +118,9 @@ export class BitcoinWriter {
    * Write a specified buffer starting at the given offset to the buffer and advance the offset.
    */
   writeBuffer(buffer: Uint8Array, offset: number = 0): void {
-    this.buffer.set(buffer, this.offset);
-    this.offset += buffer.byteLength;
+    for (let i = offset; i < buffer.byteLength; i++) {
+      this.buffer[this.offset++] = buffer[i];
+    }
   }
 
   /**
