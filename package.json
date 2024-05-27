@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/node": "^20.12.12",
+    "bitcoinjs-lib": "^6.1.5",
     "bs58": "^5.0.0"
   }
 }
