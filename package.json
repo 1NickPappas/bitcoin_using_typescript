@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "@noble/hashes": "^1.4.0",
     "@types/node": "^20.12.12",
     "bitcoinjs-lib": "^6.1.5",
-    "bs58": "^5.0.0"
+    "bs58": "^5.0.0",
+    "noble-base58check": "^0.1.4"
   }
 }
