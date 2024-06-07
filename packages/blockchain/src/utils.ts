@@ -11,8 +11,7 @@ const MAIN_NETWORK_PREFIX = 0x00;
 // - Use the Noble 'equalsBytes' function to compare the two buffers
 export function equalBuffers(buffer1: Uint8Array, buffer2: Uint8Array): boolean {
   if (buffer1.byteLength !== buffer2.byteLength) return false;
-  let i = buffer1.byteLength;
-  while (i--) {
+  for (let i = 0; i < buffer1.byteLength; i++) {
     if (buffer1[i] !== buffer2[i]) return false;
   }
   return true;
@@ -40,7 +39,7 @@ export function hash160(publicKey: Uint8Array): Uint8Array {
 // - Calculate the checksum by double hashing the result using SHA-256
 // - Append the checksum to the result
 // - Encode the final result using Base58
-export function createBitcoinAddressFromHash(publicKeyHash: Uint8Array): Promise<string> {
+export async function createBitcoinAddressFromHash(publicKeyHash: Uint8Array): Promise<string> {
   const networkPrefix = new Uint8Array([MAIN_NETWORK_PREFIX]);
   const extendedPubKeyHash = new Uint8Array([...networkPrefix, ...publicKeyHash]);
 
@@ -60,7 +59,7 @@ export function createBitcoinAddressFromHash(publicKeyHash: Uint8Array): Promise
 // - Define a function 'createBitcoinAddress' that takes a Uint8Array public key as input
 // - Hash the public key using the 'hash160' function to get the public key hash (pubKeyHash)
 // - Generate a Bitcoin address from the hashed public key using 'createBitcoinAddressFromHash'
-export function createBitcoinAddress(publicKey: Uint8Array): Promise<string> {
+export async function createBitcoinAddress(publicKey: Uint8Array): Promise<string> {
   const publicKeyHash = hash160(publicKey);
   return createBitcoinAddressFromHash(publicKeyHash);
 }
@@ -76,7 +75,15 @@ export async function isBitcoinAddress(coinAddress: string): Promise<boolean> {
 
     if (decoded.length !== 25) return false;
     if (decoded[0] !== MAIN_NETWORK_PREFIX) return false;
-    return true;
+
+    // Validate checksum
+    const checksum = decoded.slice(-4);
+    const extendedPubKeyHash = decoded.slice(0, -4);
+    const hash1 = sha256(extendedPubKeyHash);
+    const hash2 = sha256(hash1);
+    const calculatedChecksum = hash2.slice(0, 4);
+
+    return equalBuffers(checksum, calculatedChecksum);
   } catch (error) {
     return false;
   }
